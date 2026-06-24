@@ -1,0 +1,409 @@
+:root {
+  --bg: #f4f5fb;
+  --surface: #ffffff;
+  --border: #e6e8f0;
+  --text: #1a1d29;
+  --text-muted: #6b7280;
+  --accent: #6366f1;
+  --accent-dark: #4f46e5;
+  --accent-soft: #eef0ff;
+  --danger: #e11d48;
+  --danger-soft: #fef1f3;
+  --success: #16a34a;
+  --radius: 16px;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px -8px rgba(16, 24, 40, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+/* ---------- Login screen ---------- */
+
+.login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(circle at 20% 20%, #818cf8 0%, transparent 45%),
+    radial-gradient(circle at 80% 0%, #a5b4fc 0%, transparent 40%),
+    linear-gradient(160deg, #4f46e5 0%, #6366f1 45%, #818cf8 100%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 36px 32px;
+  box-shadow: 0 20px 50px -12px rgba(30, 27, 75, 0.35);
+}
+
+.login-card .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.login-card .brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.login-card h1 {
+  font-size: 22px;
+}
+
+.login-card .subtitle {
+  color: var(--text-muted);
+  font-size: 14px;
+  margin: 6px 0 24px;
+  line-height: 1.5;
+}
+
+.login-card .demo-hint {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+input {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 11px 13px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fbfbfe;
+  color: var(--text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+}
+
+input::placeholder {
+  color: #a1a4b3;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  background: var(--surface);
+}
+
+button {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 11px 18px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  color: white;
+  transition: transform 0.1s, box-shadow 0.15s, opacity 0.15s;
+  box-shadow: 0 4px 14px -4px rgba(79, 70, 229, 0.5);
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px -4px rgba(79, 70, 229, 0.55);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--text-muted);
+  box-shadow: none;
+  border: 1px solid var(--border);
+}
+
+button.secondary:hover {
+  background: #f3f4f8;
+  box-shadow: none;
+}
+
+button.block {
+  width: 100%;
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  margin: 14px 0;
+}
+
+/* ---------- App shell ---------- */
+
+.app-shell {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.app-header .brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-header .brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 800;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.app-header h1 {
+  font-size: 19px;
+}
+
+.app-header .welcome {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+/* ---------- Stat cards ---------- */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+
+.stat-card .stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.stat-card .stat-value {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.stat-card.positive .stat-value {
+  color: var(--success);
+}
+
+.stat-card.negative .stat-value {
+  color: var(--danger);
+}
+
+/* ---------- Section panels ---------- */
+
+.panels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 24px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.panel-header .icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  background: var(--accent-soft);
+}
+
+.panel-header h2 {
+  font-size: 16px;
+}
+
+.entry-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+  background: #fafafe;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.entry-form .field {
+  margin-bottom: 0;
+}
+
+.entry-form button {
+  grid-column: 1 / -1;
+}
+
+.entry-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.entry-list:empty::after {
+  content: "Nessun dato ancora.";
+}
+
+.empty-state {
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px 0;
+}
+
+.entry-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: #fdfdfe;
+}
+
+.entry-card .entry-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.entry-card .entry-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.entry-card .entry-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.entry-card .entry-amount {
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.entry-card.expense .entry-amount {
+  color: var(--danger);
+}
+
+.entry-card.salary .entry-amount {
+  color: var(--success);
+}
+
+.tag {
+  display: inline-block;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 2px 7px;
+  margin-left: 6px;
+}
