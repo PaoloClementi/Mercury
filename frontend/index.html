@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mercury</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 24px; max-width: 900px; }
+      h2 { margin-bottom: 8px; }
+      form { margin-bottom: 24px; padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+      input { margin: 4px; padding: 8px; }
+      button { padding: 8px 12px; margin-top: 8px; }
+      .error { color: #b00020; }
+      .card { border: 1px solid #eee; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+    </style>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useEffect, useState } = React;
+
+      function App() {
+        const [user, setUser] = useState(null);
+        const [error, setError] = useState("");
+        const [expenses, setExpenses] = useState([]);
+        const [salaries, setSalaries] = useState([]);
+
+        const [credentials, setCredentials] = useState({ username: "", password: "" });
+        const [expenseForm, setExpenseForm] = useState({ category: "", section: "", amount: "", note: "" });
+        const [salaryForm, setSalaryForm] = useState({ month: "", amount: "", note: "" });
+
+        async function loadData() {
+          const [expenseResponse, salaryResponse] = await Promise.all([
+            fetch("/api/expenses"),
+            fetch("/api/salary"),
+          ]);
+          setExpenses(await expenseResponse.json());
+          setSalaries(await salaryResponse.json());
+        }
+
+        useEffect(() => {
+          if (user) {
+            loadData();
+          }
+        }, [user]);
+
+        async function onLogin(event) {
+          event.preventDefault();
+          setError("");
+          const response = await fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(credentials),
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            setError(data.error || "Login fallito");
+            return;
+          }
+          setUser(data);
+        }
+
+        async function onAddExpense(event) {
+          event.preventDefault();
+          const response = await fetch("/api/expenses", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(expenseForm),
+          });
+          if (!response.ok) return;
+          setExpenseForm({ category: "", section: "", amount: "", note: "" });
+          await loadData();
+        }
+
+        async function onAddSalary(event) {
+          event.preventDefault();
+          const response = await fetch("/api/salary", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(salaryForm),
+          });
+          if (!response.ok) return;
+          setSalaryForm({ month: "", amount: "", note: "" });
+          await loadData();
+        }
+
+        if (!user) {
+          return (
+            <main>
+              <h1>Mercury - Login</h1>
+              <p>Utente demo: <strong>cyran31</strong> / Password: <strong>mercury123</strong></p>
+              <form onSubmit={onLogin}>
+                <input
+                  placeholder="Username"
+                  value={credentials.username}
+                  onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
+                  required
+                />
+                <input
+                  placeholder="Password"
+                  type="password"
+                  value={credentials.password}
+                  onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
+                  required
+                />
+                <br />
+                <button type="submit">Accedi</button>
+              </form>
+              {error && <p className="error">{error}</p>}
+            </main>
+          );
+        }
+
+        return (
+          <main>
+            <h1>Mercury - Gestione economica</h1>
+            <p>Benvenuto, {user.username}</p>
+
+            <h2>Note spese</h2>
+            <form onSubmit={onAddExpense}>
+              <input placeholder="Categoria (es. benzina)" value={expenseForm.category} onChange={(e) => setExpenseForm({ ...expenseForm, category: e.target.value })} required />
+              <input placeholder="Sezione" value={expenseForm.section} onChange={(e) => setExpenseForm({ ...expenseForm, section: e.target.value })} />
+              <input placeholder="Importo" type="number" step="0.01" value={expenseForm.amount} onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })} required />
+              <input placeholder="Nota" value={expenseForm.note} onChange={(e) => setExpenseForm({ ...expenseForm, note: e.target.value })} />
+              <br />
+              <button type="submit">Salva spesa</button>
+            </form>
+            {expenses.map((expense) => (
+              <div key={expense.id} className="card">
+                <strong>{expense.category}</strong> - € {expense.amount.toFixed(2)}
+                {expense.section ? ` [${expense.section}]` : ""}
+                {expense.note ? ` - ${expense.note}` : ""}
+              </div>
+            ))}
+
+            <h2>Stipendio effettivo</h2>
+            <form onSubmit={onAddSalary}>
+              <input placeholder="Mese (es. 2026-06)" value={salaryForm.month} onChange={(e) => setSalaryForm({ ...salaryForm, month: e.target.value })} required />
+              <input placeholder="Importo" type="number" step="0.01" value={salaryForm.amount} onChange={(e) => setSalaryForm({ ...salaryForm, amount: e.target.value })} required />
+              <input placeholder="Nota" value={salaryForm.note} onChange={(e) => setSalaryForm({ ...salaryForm, note: e.target.value })} />
+              <br />
+              <button type="submit">Salva stipendio</button>
+            </form>
+            {salaries.map((salary) => (
+              <div key={salary.id} className="card">
+                <strong>{salary.month}</strong> - € {salary.amount.toFixed(2)}
+                {salary.note ? ` - ${salary.note}` : ""}
+              </div>
+            ))}
+          </main>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>

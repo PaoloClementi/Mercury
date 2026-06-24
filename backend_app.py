@@ -1,0 +1,159 @@
+from __future__ import annotations
+
+import sqlite3
+from pathlib import Path
+from typing import Any
+
+from flask import Flask, jsonify, request
+
+BASE_DIR = Path(__file__).resolve().parent
+DB_PATH = BASE_DIR / "mercury.db"
+
+
+def get_connection() -> sqlite3.Connection:
+    connection = sqlite3.connect(DB_PATH)
+    connection.row_factory = sqlite3.Row
+    return connection
+
+
+def init_db() -> None:
+    with get_connection() as connection:
+        connection.executescript(
+            """
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL UNIQUE,
+                password TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS expenses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category TEXT NOT NULL,
+                section TEXT,
+                amount REAL NOT NULL,
+                note TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            );
+
+            CREATE TABLE IF NOT EXISTS salaries (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                month TEXT NOT NULL,
+                amount REAL NOT NULL,
+                note TEXT,
+                created_at TEXT DEFAULT CURRENT_TIMESTAMP
+            );
+            """
+        )
+        connection.execute(
+            "INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)",
+            ("cyran31", "mercury123"),
+        )
+
+
+def create_app() -> Flask:
+    app = Flask(__name__, static_folder="frontend", static_url_path="")
+
+    @app.get("/")
+    def index() -> Any:
+        return app.send_static_file("index.html")
+
+    @app.post("/api/login")
+    def login() -> Any:
+        payload = request.get_json(silent=True) or {}
+        username = (payload.get("username") or "").strip()
+        password = payload.get("password") or ""
+
+        if not username or not password:
+            return jsonify({"error": "Username e password sono obbligatori."}), 400
+
+        with get_connection() as connection:
+            user = connection.execute(
+                "SELECT id, username FROM users WHERE username = ? AND password = ?",
+                (username, password),
+            ).fetchone()
+
+        if user is None:
+            return jsonify({"error": "Credenziali non valide."}), 401
+
+        return jsonify({"id": user["id"], "username": user["username"]})
+
+    @app.get("/api/expenses")
+    def list_expenses() -> Any:
+        with get_connection() as connection:
+            rows = connection.execute(
+                "SELECT id, category, section, amount, note, created_at FROM expenses ORDER BY id DESC"
+            ).fetchall()
+        return jsonify([dict(row) for row in rows])
+
+    @app.post("/api/expenses")
+    def create_expense() -> Any:
+        payload = request.get_json(silent=True) or {}
+        category = (payload.get("category") or "").strip()
+        section = (payload.get("section") or "").strip()
+        note = (payload.get("note") or "").strip()
+
+        try:
+            amount = float(payload.get("amount"))
+        except (TypeError, ValueError):
+            return jsonify({"error": "Importo spesa non valido."}), 400
+
+        if not category:
+            return jsonify({"error": "Categoria spesa obbligatoria."}), 400
+
+        with get_connection() as connection:
+            cursor = connection.execute(
+                "INSERT INTO expenses (category, section, amount, note) VALUES (?, ?, ?, ?)",
+                (category, section, amount, note),
+            )
+            expense_id = cursor.lastrowid
+            row = connection.execute(
+                "SELECT id, category, section, amount, note, created_at FROM expenses WHERE id = ?",
+                (expense_id,),
+            ).fetchone()
+
+        return jsonify(dict(row)), 201
+
+    @app.get("/api/salary")
+    def list_salary() -> Any:
+        with get_connection() as connection:
+            rows = connection.execute(
+                "SELECT id, month, amount, note, created_at FROM salaries ORDER BY id DESC"
+            ).fetchall()
+        return jsonify([dict(row) for row in rows])
+
+    @app.post("/api/salary")
+    def create_salary() -> Any:
+        payload = request.get_json(silent=True) or {}
+        month = (payload.get("month") or "").strip()
+        note = (payload.get("note") or "").strip()
+
+        try:
+            amount = float(payload.get("amount"))
+        except (TypeError, ValueError):
+            return jsonify({"error": "Importo stipendio non valido."}), 400
+
+        if not month:
+            return jsonify({"error": "Mese stipendio obbligatorio."}), 400
+
+        with get_connection() as connection:
+            cursor = connection.execute(
+                "INSERT INTO salaries (month, amount, note) VALUES (?, ?, ?)",
+                (month, amount, note),
+            )
+            salary_id = cursor.lastrowid
+            row = connection.execute(
+                "SELECT id, month, amount, note, created_at FROM salaries WHERE id = ?",
+                (salary_id,),
+            ).fetchone()
+
+        return jsonify(dict(row)), 201
+
+    return app
+
+
+init_db()
+app = create_app()
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
