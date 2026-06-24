@@ -2,12 +2,16 @@ from __future__ import annotations
 
 import sqlite3
 from pathlib import Path
+import re
 from typing import Any
 
 from flask import Flask, jsonify, request
+from werkzeug.security import check_password_hash, generate_password_hash
 
 BASE_DIR = Path(__file__).resolve().parent
 DB_PATH = BASE_DIR / "mercury.db"
+MAX_ALLOWED_AMOUNT = 1_000_000
+MONTH_PATTERN = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
 
 
 def get_connection() -> sqlite3.Connection:
@@ -17,6 +21,7 @@ def get_connection() -> sqlite3.Connection:
 
 
 def init_db() -> None:
+    hashed_password = generate_password_hash("mercury123")
     with get_connection() as connection:
         connection.executescript(
             """
@@ -46,8 +51,17 @@ def init_db() -> None:
         )
         connection.execute(
             "INSERT OR IGNORE INTO users (username, password) VALUES (?, ?)",
-            ("cyran31", "mercury123"),
+            ("cyran31", hashed_password),
         )
+        existing_user = connection.execute(
+            "SELECT id, password FROM users WHERE username = ?",
+            ("cyran31",),
+        ).fetchone()
+        if existing_user and not str(existing_user["password"]).startswith("scrypt:"):
+            connection.execute(
+                "UPDATE users SET password = ? WHERE id = ?",
+                (hashed_password, existing_user["id"]),
+            )
 
 
 def create_app() -> Flask:
@@ -68,11 +82,11 @@ def create_app() -> Flask:
 
         with get_connection() as connection:
             user = connection.execute(
-                "SELECT id, username FROM users WHERE username = ? AND password = ?",
-                (username, password),
+                "SELECT id, username, password FROM users WHERE username = ?",
+                (username,),
             ).fetchone()
 
-        if user is None:
+        if user is None or not check_password_hash(user["password"], password):
             return jsonify({"error": "Credenziali non valide."}), 401
 
         return jsonify({"id": user["id"], "username": user["username"]})
@@ -99,6 +113,8 @@ def create_app() -> Flask:
 
         if not category:
             return jsonify({"error": "Categoria spesa obbligatoria."}), 400
+        if amount <= 0 or amount > MAX_ALLOWED_AMOUNT:
+            return jsonify({"error": "Importo spesa fuori range consentito."}), 400
 
         with get_connection() as connection:
             cursor = connection.execute(
@@ -134,6 +150,10 @@ def create_app() -> Flask:
 
         if not month:
             return jsonify({"error": "Mese stipendio obbligatorio."}), 400
+        if not MONTH_PATTERN.match(month):
+            return jsonify({"error": "Formato mese non valido. Usa YYYY-MM."}), 400
+        if amount <= 0 or amount > MAX_ALLOWED_AMOUNT:
+            return jsonify({"error": "Importo stipendio fuori range consentito."}), 400
 
         with get_connection() as connection:
             cursor = connection.execute(
@@ -156,4 +176,4 @@ app = create_app()
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

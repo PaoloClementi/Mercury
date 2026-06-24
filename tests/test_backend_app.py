@@ -46,6 +46,19 @@ class MercuryBackendTests(unittest.TestCase):
         salaries = self.client.get("/api/salary")
         self.assertEqual(len(salaries.get_json()), 1)
 
+    def test_rejects_invalid_amount_and_month(self):
+        invalid_expense = self.client.post(
+            "/api/expenses",
+            json={"category": "benzina", "amount": -1, "section": "", "note": ""},
+        )
+        self.assertEqual(invalid_expense.status_code, 400)
+
+        invalid_salary = self.client.post(
+            "/api/salary",
+            json={"month": "2026/06", "amount": 1500, "note": "wrong format"},
+        )
+        self.assertEqual(invalid_salary.status_code, 400)
+
 
 if __name__ == "__main__":
     unittest.main()
