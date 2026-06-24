@@ -118,12 +118,14 @@
               <form onSubmit={onLogin}>
                 <input
                   placeholder="Username"
+                  aria-label="Username"
                   value={credentials.username}
                   onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}
                   required
                 />
                 <input
                   placeholder="Password"
+                  aria-label="Password"
                   type="password"
                   value={credentials.password}
                   onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}
@@ -145,16 +147,16 @@
 
             <h2>Note spese</h2>
             <form onSubmit={onAddExpense}>
-              <input placeholder="Categoria (es. benzina)" value={expenseForm.category} onChange={(e) => setExpenseForm({ ...expenseForm, category: e.target.value })} required />
-              <input placeholder="Sezione" value={expenseForm.section} onChange={(e) => setExpenseForm({ ...expenseForm, section: e.target.value })} />
-              <input placeholder="Importo" type="number" step="0.01" value={expenseForm.amount} onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })} required />
-              <input placeholder="Nota" value={expenseForm.note} onChange={(e) => setExpenseForm({ ...expenseForm, note: e.target.value })} />
+              <input aria-label="Categoria spesa" placeholder="Categoria (es. benzina)" value={expenseForm.category} onChange={(e) => setExpenseForm({ ...expenseForm, category: e.target.value })} required />
+              <input aria-label="Sezione spesa" placeholder="Sezione" value={expenseForm.section} onChange={(e) => setExpenseForm({ ...expenseForm, section: e.target.value })} />
+              <input aria-label="Importo spesa" placeholder="Importo" type="number" step="0.01" value={expenseForm.amount} onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })} required />
+              <input aria-label="Nota spesa" placeholder="Nota" value={expenseForm.note} onChange={(e) => setExpenseForm({ ...expenseForm, note: e.target.value })} />
               <br />
               <button type="submit">Salva spesa</button>
             </form>
             {expenses.map((expense) => (
               <div key={expense.id} className="card">
-                <strong>{expense.category}</strong> - <span aria-label={`Euro ${expense.amount.toFixed(2)}`}>€ {expense.amount.toFixed(2)}</span>
+                <strong>{expense.category}</strong> - € {expense.amount.toFixed(2)}
                 {expense.section ? ` [${expense.section}]` : ""}
                 {expense.note ? ` - ${expense.note}` : ""}
               </div>
@@ -162,15 +164,15 @@
 
             <h2>Stipendio effettivo</h2>
             <form onSubmit={onAddSalary}>
-              <input placeholder="Mese (es. 2026-06)" value={salaryForm.month} onChange={(e) => setSalaryForm({ ...salaryForm, month: e.target.value })} required />
-              <input placeholder="Importo" type="number" step="0.01" value={salaryForm.amount} onChange={(e) => setSalaryForm({ ...salaryForm, amount: e.target.value })} required />
-              <input placeholder="Nota" value={salaryForm.note} onChange={(e) => setSalaryForm({ ...salaryForm, note: e.target.value })} />
+              <input aria-label="Mese stipendio" placeholder="Mese (es. 2026-06)" value={salaryForm.month} onChange={(e) => setSalaryForm({ ...salaryForm, month: e.target.value })} required />
+              <input aria-label="Importo stipendio" placeholder="Importo" type="number" step="0.01" value={salaryForm.amount} onChange={(e) => setSalaryForm({ ...salaryForm, amount: e.target.value })} required />
+              <input aria-label="Nota stipendio" placeholder="Nota" value={salaryForm.note} onChange={(e) => setSalaryForm({ ...salaryForm, note: e.target.value })} />
               <br />
               <button type="submit">Salva stipendio</button>
             </form>
             {salaries.map((salary) => (
               <div key={salary.id} className="card">
-                <strong>{salary.month}</strong> - <span aria-label={`Euro ${salary.amount.toFixed(2)}`}>€ {salary.amount.toFixed(2)}</span>
+                <strong>{salary.month}</strong> - € {salary.amount.toFixed(2)}
                 {salary.note ? ` - ${salary.note}` : ""}
               </div>
             ))}
