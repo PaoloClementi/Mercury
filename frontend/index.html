@@ -154,7 +154,7 @@
             </form>
             {expenses.map((expense) => (
               <div key={expense.id} className="card">
-                <strong>{expense.category}</strong> - € {expense.amount.toFixed(2)}
+                <strong>{expense.category}</strong> - <span aria-label={`Euro ${expense.amount.toFixed(2)}`}>€ {expense.amount.toFixed(2)}</span>
                 {expense.section ? ` [${expense.section}]` : ""}
                 {expense.note ? ` - ${expense.note}` : ""}
               </div>
@@ -170,7 +170,7 @@
             </form>
             {salaries.map((salary) => (
               <div key={salary.id} className="card">
-                <strong>{salary.month}</strong> - € {salary.amount.toFixed(2)}
+                <strong>{salary.month}</strong> - <span aria-label={`Euro ${salary.amount.toFixed(2)}`}>€ {salary.amount.toFixed(2)}</span>
                 {salary.note ? ` - ${salary.note}` : ""}
               </div>
             ))}

@@ -57,11 +57,17 @@ def init_db() -> None:
             "SELECT id, password FROM users WHERE username = ?",
             ("cyran31",),
         ).fetchone()
-        if existing_user and not str(existing_user["password"]).startswith("scrypt:"):
-            connection.execute(
-                "UPDATE users SET password = ? WHERE id = ?",
-                (hashed_password, existing_user["id"]),
-            )
+        if existing_user:
+            stored_password = str(existing_user["password"])
+            try:
+                already_hashed = check_password_hash(stored_password, "mercury123")
+            except ValueError:
+                already_hashed = False
+            if not already_hashed and stored_password == "mercury123":
+                connection.execute(
+                    "UPDATE users SET password = ? WHERE id = ?",
+                    (hashed_password, existing_user["id"]),
+                )
 
 
 def create_app() -> Flask:
@@ -75,7 +81,7 @@ def create_app() -> Flask:
     def login() -> Any:
         payload = request.get_json(silent=True) or {}
         username = (payload.get("username") or "").strip()
-        password = payload.get("password") or ""
+        password = (payload.get("password") or "").strip()
 
         if not username or not password:
             return jsonify({"error": "Username e password sono obbligatori."}), 400
