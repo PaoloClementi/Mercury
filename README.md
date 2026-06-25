@@ -1,14 +1,14 @@
-# Mercury
+Mercury
+Mercury is a React + Python web app for personal finance management.
 
-Mercury è una web app React + Python per la gestione finanziaria personale.
+Implemented Requirements
+Login with credentials stored in a local DB (sqlite, lightweight local equivalent to H2 for this Python stack).
+Post-login page with two sections:
 
-## Requisiti implementati
-- Login con credenziali salvate in DB locale (`sqlite`, equivalente locale leggero a H2 per questo stack Python).
-- Pagina post-login con due aree:
-  - Gestione note spese (es. benzina, rimborso chilometrico, altre spese con sezione).
-  - Gestione stipendio effettivo.
+Expense notes management (e.g., fuel, mileage reimbursement, other expenses with categorization).
+Actual salary management.
 
-## Avvio rapido
+## Quick Start
 ```bash
 python -m venv .venv
 source .venv/bin/activate
@@ -16,9 +16,9 @@ pip install -r requirements.txt
 python backend_app.py
 ```
 
-Apri `http://127.0.0.1:5000`
+Open `http://127.0.0.1:5000`
 
-Credenziali demo:
+demo credential:
 - username: `cyran31`
 - password: `mercury123`
 
